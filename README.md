@@ -215,6 +215,4 @@ Existing comparison figures and summary CSV files are available in [`VIS_PTH_COM
 
 ## Publication and Citation
 
-The project title is **AR2SA: Geometric Polarization of Ambiguous Regions towards Silent and Audio States for Audio-Visual Segmentation**.
-
-Author information, a paper link, publication details, and an official BibTeX entry are not present in this checkout. Add verified publication metadata here when available.
+The project title is **AR2SA: Geometric Polarization of Ambiguous Regions towards Silent and Audio States for Audio-Visual Segmentation** (Under review). 
