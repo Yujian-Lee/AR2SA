@@ -200,16 +200,6 @@ The script saves tensors under `<audio_cache_dir>/<task>/<split>/<uid>.pt`. The 
 
 Existing comparison figures and summary CSV files are available in [`VIS_PTH_COMPARE_THREE_TFS/COMPARE/`](VIS_PTH_COMPARE_THREE_TFS/COMPARE/). Plotting defaults in the scripts are experimental values and should be replaced with verified results before use in a paper or benchmark report.
 
-## Current Implementation Notes
-
-<details>
-<summary><strong>Expand setup and reproduction notes</strong></summary>
-
-- **Dataset fields:** `custom_collate()` reads fields such as `feat_aud`, `optical_pixel_values`, and text / CLIP features that `AVSBench.__getitem__()` does not currently return. Although `feat_aud` is computed, it is not inserted into the returned dictionary. Align these interfaces before training or evaluation.
-- **Task scope:** the wrapper assumes five frames. The `avss` loader branch references functions absent from this file, and `v2` uses a ten-frame dataset path. Additional tasks need implementation checks.
-- **Saved-mask behavior:** the model reads previous masks only when `idx_ep == mask_warmup_epochs`, rather than for every subsequent epoch. Evaluation passes epoch value `1`, which activates this branch with the default setting. Missing saved masks fall back to `opticalNObg`.
-- **Configuration vs. execution:** some arguments, including resume and split-control options, have helper code or parser entries but are not connected to the current main training loop. Check actual entry-point behavior before relying on them.
-- **Artifacts:** dataset files, pretrained weights, and trained checkpoints are not included. No verified reproduction environment or official benchmark table is provided here.
 
 </details>
 
