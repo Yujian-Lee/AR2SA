@@ -144,7 +144,7 @@ python train.py \
 | `--mask_warmup_epochs` | `1` | Epoch value used by the model's saved-mask branch |
 | `--log_dir` | `./log_NEW_2025_3_30` | Parent directory for timestamped training runs |
 
-The current training loop evaluates the **test split** each epoch and saves `f_miou_best.pth` when its mIoU improves beyond the initial threshold of `0.1`. At epoch index `14`, it reloads the best checkpoint and recreates the optimizer with a learning rate of `1e-4`. Training masks are exported to `./v1mtrainMASK1000/`.
+The current training loop evaluates the **test split** each epoch and saves `f_miou_best.pth` when its mIoU improves beyond the initial threshold of `0.1`. At epoch index `14`, it reloads the best checkpoint and recreates the optimizer with a learning rate of `1e-4`. Training (Validation/Testing) masks are exported to `./v1mtrain(valid/test)MASK/`.
 
 For experiments that require validation-based model selection, update the split used by the training loop before reporting results.
 
