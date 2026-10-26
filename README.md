@@ -113,7 +113,6 @@ data/
 
 Images and masks are resized to **384 × 384**. The current binary task treats nonzero mask pixels as foreground and extracts one 128-dimensional audio embedding for each of five audio segments.
 
-Use a relative data path such as `./data`: the current loader prefixes sample paths with `./`. The `opticalNObg` masks must be prepared separately; their generation is not included in this checkout.
 
 ## Training
 
