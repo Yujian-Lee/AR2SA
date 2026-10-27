@@ -22,7 +22,7 @@ The current implementation combines:
 
 - **Visual features:** a Mask2Former model with a Swin backbone.
 - **Audio guidance:** 128-dimensional VGGish embeddings projected into the segmentation model.
-- **Region guidance:** foreground masks from `opticalNObg` and optional previously predicted masks.
+- **Region guidance:** foreground masks from `opticalNObg` (utilize optical flow (Opticl-Perceiver-IO) and background removal (Braia)) and optional previously predicted masks.
 - **Selective fine-tuning:** adapters, query embeddings, the class predictor, and audio projection layers.
 - **Evaluation and analysis:** mIoU, F-score, predicted masks, and geometry comparison plots.
 
