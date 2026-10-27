@@ -197,9 +197,7 @@ python scripts/precompute_audio_vggish_cache.py \
 
 The script saves tensors under `<audio_cache_dir>/<task>/<split>/<uid>.pt`. The current dataset loader still computes audio embeddings online; it does not read this cache yet.
 
-Existing comparison figures and summary CSV files are available in [`VIS_PTH_COMPARE_THREE_TFS/COMPARE/`](VIS_PTH_COMPARE_THREE_TFS/COMPARE/). Plotting defaults in the scripts are experimental values and should be replaced with verified results before use in a paper or benchmark report.
-
-
+Existing comparison figures and summary CSV files are available in [`VIS_PTH_COMPARE_THREE_TFS/COMPARE/`](VIS_PTH_COMPARE_THREE_TFS/COMPARE/). 
 </details>
 
 ## Publication and Citation
