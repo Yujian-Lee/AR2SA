@@ -90,7 +90,7 @@ The model wrapper loads `facebook/mask2former-swin-base-ade-semantic` with `loca
 
 - `--model_dir` specifies the cache directory used by the model wrapper.
 - The dataset separately loads its image processor from the literal path `.models`.
-- Both loading paths need to resolve successfully; changing `--model_dir` alone does not update the dataset processor path.
+
 
 ### 3. Dataset Layout
 
