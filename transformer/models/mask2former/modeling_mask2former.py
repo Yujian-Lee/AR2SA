@@ -81,11 +81,10 @@ class Semantic_flow(nn.Module):
         # Using two separate Conv1x1 to compact the high-level & low-level features
         low_feature = self.down_l(low_feature)
         h_feature = self.down_h(h_feature)
-        # 将high-level feature进行双线性上采样
+        # Bi-linear interopolation
         h_feature = F.interpolate(h_feature, size=size, mode="bilinear", align_corners=False)
-        # 预测语义流场
+        # Predict the semantic flow grid
         flow = self.flow_make(torch.cat([h_feature, low_feature], 1))
-        # 将Flow Field warp 到当前的 high-level feature中
         h_feature = self.flow_warp(h_feature_origin, flow, size=size)
         #h_feature=self.conv(h_feature)
         B, C, H, W = h_feature.shape
@@ -94,10 +93,9 @@ class Semantic_flow(nn.Module):
 
     @staticmethod
     def flow_warp(inputs, flow, size):
-        out_h = size  # 对应高分辨率的low-level feature的特征图尺寸
+        out_h = size
         out_w = size
-        n, c, h, w = inputs.size()  # 对应低分辨率的high-level feature的4个输入维度
-
+        n, c, h, w = inputs.size() 
 
         norm = torch.tensor([[[[out_w, out_h]]]]).type_as(inputs).to(inputs.device)
         # 从-1到1等距离生成out_h个点，每一行重复out_w个点，最终生成(out_h, out_w)的像素点
