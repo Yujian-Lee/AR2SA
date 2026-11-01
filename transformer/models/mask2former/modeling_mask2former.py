@@ -83,7 +83,7 @@ class Semantic_flow(nn.Module):
         h_feature = self.down_h(h_feature)
         # 将high-level feature进行双线性上采样
         h_feature = F.interpolate(h_feature, size=size, mode="bilinear", align_corners=False)
-        # 预测语义流场 === 其实就是输入一个3x3的卷积
+        # 预测语义流场
         flow = self.flow_make(torch.cat([h_feature, low_feature], 1))
         # 将Flow Field warp 到当前的 high-level feature中
         h_feature = self.flow_warp(h_feature_origin, flow, size=size)
@@ -114,7 +114,6 @@ class Semantic_flow(nn.Module):
         #print(grid.size())
         # grid指定由input空间维度归一化的采样像素位置，其大部分值应该在[ -1, 1]的范围内
         # 如x=-1,y=-1是input的左上角像素，x=1,y=1是input的右下角像素。
-        # 具体可以参考《Spatial Transformer Networks》，下方参考文献[2]
         output = F.grid_sample(inputs, grid,align_corners=False)
         #print(output.size())
         return output
@@ -3706,7 +3705,6 @@ class Mask2FormerTransformerModule(nn.Module):
                 # union = pred.sum(dim=1) + target.sum(dim=1)
                 # multi_diceloss = 1 - (2 * intersection + eps) / (union + eps)
                 # multiSales_diceloss += multi_diceloss.mean()
-                # ------------------ Trick 核心开始 ------------------
                 # 2. 全局统计量计算 (利用 Batch 中所有非黑帧来稳健协方差)
                 all_mask_s = audio_prompt <= low
                 all_mask_a = audio_prompt >= high
@@ -3741,109 +3739,6 @@ class Mask2FormerTransformerModule(nn.Module):
                 diff_y = torch.abs(m[:,:,:-1,:]-m[:,:,1:,:])
                 loss_conf += (2*((diff_x*u[:,:,:,:-1]).mean()+(diff_y*u[:,:,:-1,:]).mean()))
 
-                ########可视化########
-                from sklearn.manifold import TSNE
-                from sklearn.decomposition import PCA
-                # from matplotlib.patches import Ellipse
-                def show(x, title):
-                    plt.imshow(x, cmap='viridis')
-                    plt.colorbar()
-                    plt.title(title)
-                    plt.axis('off')
-            
-                # for kkk in range(min(5, audio_prompt.shape[0])):
-                #     prompt = audio_prompt[kkk].reshape(H, W).detach().cpu()
-                #     entropy = entropy_map[kkk].reshape(H, W).detach().cpu()
-                #     penalty = penalty_map[kkk].reshape(H, W).detach().cpu()
-                #     uncertain = uncertain_mask[kkk].reshape(H, W).float().detach().cpu()
-                #     plt.figure(figsize=(16,4))
-                #     plt.subplot(1,4,1)
-                #     show(prompt, "Audio Prompt")
-                #     plt.subplot(1,4,2)
-                #     show(entropy, "Entropy")
-                #     plt.subplot(1,4,3)
-                #     show(penalty, "Penalty")
-                #     plt.subplot(1,4,4)
-                #     show(uncertain, "Uncertain Region")
-                #     plt.savefig(f'./VIS_new/{batch_id}_uncertainty_{kkk}.png')
-                #     plt.close()
-
-
-                    # feat = position_embed[kkk].reshape(-1, position_embed.shape[-1]).detach().cpu().numpy()
-                    
-                    # pca = PCA(n_components=2)
-                    # feat_2d = pca.fit_transform(feat)
-                    # features=feat_2d
-                    # cov = np.cov(features.T)
-                    # mean = features.mean(axis=0)
-                
-                    # eigvals, eigvecs = np.linalg.eigh(cov)
-                    # angle = np.degrees(np.arctan2(*eigvecs[:,1][::-1]))
-                
-                    # width, height = 2 * np.sqrt(eigvals)
-                
-                    # fig, ax = plt.subplots()
-                    # ax.scatter(features[:,0], features[:,1], s=5)
-                
-                    # ellipse = Ellipse(mean, width, height, angle=angle, fill=False)
-                    # ax.add_patch(ellipse)
-                
-                    # plt.title("RD: Covariance Structure")
-                    # plt.savefig(f'./VIS_RD/{batch_id}_RD_{kkk}.png')
-
-                        # ===== 1. reshape =====
-                    # feat = position_embed[kkk].reshape(-1, position_embed.shape[-1]).detach().cpu().numpy()
-                    # prompt = audio_prompt[kkk].reshape(-1).detach().cpu().numpy()
-                
-                    # # ===== 2. 三种 mask =====
-                    # mask_s = prompt <= low
-                    # mask_a = prompt >= high
-                    # mask_u = (prompt > low) & (prompt < high)
-                
-                    # # ===== 3. t-SNE =====
-                    # tsne = TSNE(n_components=2, perplexity=30, random_state=0)
-                    # feat_2d = tsne.fit_transform(feat)
-                
-                    # # ===== 4. 开始画 =====
-                    # plt.figure(figsize=(18,5))
-                
-                    # # -----------------------------------
-                    # # 🔵 1. 原始（不区分 uncertain）
-                    # # -----------------------------------
-                    # plt.subplot(1,3,1)
-                    # plt.scatter(feat_2d[:,0], feat_2d[:,1], s=2, alpha=0.5)
-                    # plt.title("Raw Feature Distribution")
-                    # plt.xticks([])
-                    # plt.yticks([])
-                
-                    # # -----------------------------------
-                    # # 🟢 2. RD + ODS（两类拉开）
-                    # # -----------------------------------
-                    # plt.subplot(1,3,2)
-                    # plt.scatter(feat_2d[mask_s,0], feat_2d[mask_s,1], s=2, alpha=0.5, label="Silence")
-                    # plt.scatter(feat_2d[mask_a,0], feat_2d[mask_a,1], s=2, alpha=0.5, label="Active")
-                    # plt.title("After RD + ODS")
-                    # plt.legend()
-                    # plt.xticks([])
-                    # plt.yticks([])
-                
-                    # # -----------------------------------
-                    # # 🔴 3. HARD（uncertain参与）
-                    # # -----------------------------------
-                    # plt.subplot(1,3,3)
-                    # plt.scatter(feat_2d[mask_s,0], feat_2d[mask_s,1], s=2, alpha=0.4, label="Silence")
-                    # plt.scatter(feat_2d[mask_a,0], feat_2d[mask_a,1], s=2, alpha=0.4, label="Active")
-                    # plt.scatter(feat_2d[mask_u,0], feat_2d[mask_u,1], s=3, alpha=0.8, label="Uncertain")
-                    # plt.title("After HARD (Final)")
-                    # plt.legend()
-                    # plt.xticks([])
-                    # plt.yticks([])
-                
-                    # plt.tight_layout()
-                    # plt.savefig(f'./VIS_RD/{batch_id}_RD_{kkk}.png')
-                    # plt.close()
-
-                ########可视化########
 
 
                 
@@ -3855,12 +3750,8 @@ class Mask2FormerTransformerModule(nn.Module):
                     b_mask_a = b_prompt >= high
                     b_mask_s = b_prompt <= low
                     b_mask_u = (b_prompt > low) & (b_prompt < high)
-                    
-                    
-                    # --- Trick: 处理全黑样本 ---
+      
                     if not b_mask_a.any():
-                        # 如果是全黑帧（无物体），强制所有特征向“静音中心”靠拢
-                        # 这样能净化背景特征，防止背景里出现类似物体的噪声
                         s_center_fixed = self.silence_embed.weight
                         dist_to_silence = torch.norm(b_feat - s_center_fixed, dim=-1)
                         loss_mmd += 0.2 * dist_to_silence.mean() / batch_size
@@ -4026,17 +3917,7 @@ class Mask2FormerTransformerModule(nn.Module):
         
         feat_mean = feat.mean(dim=1)  # [B, H, W]
         
-        # for kkk in range(5):
-        #     fmap = feat[kkk].reshape(256, -1).permute(1,0).detach().cpu().numpy()  # [HW, C]
-        
-        #     pca = PCA(n_components=1)
-        #     fmap_pca = pca.fit_transform(fmap)  # [HW,1]
-        #     fmap_pca = fmap_pca.reshape(12,12)
-        
-        #     plt.figure(figsize=(5,5))
-        #     show(fmap_pca, "Feature PCA")
-        #     plt.savefig(f'./VIS_feat/{batch_id}_feat_pca_{kkk}.png')
-        #     plt.close()
+    
         
 
 
