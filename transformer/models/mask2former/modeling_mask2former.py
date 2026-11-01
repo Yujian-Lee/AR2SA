@@ -59,7 +59,7 @@ MASK2FORMER_PRETRAINED_MODEL_ARCHIVE_LIST = [
 class Semantic_flow(nn.Module):
     def __init__(self,inchannel,outchannel):
         super(Semantic_flow, self).__init__()
-        #inchannel为低分辨率图片通道数，outchannel为高分辨率图片通道数
+        #inchannel: lower resolution channel (stage x-1), outchannel: higher resolution channel (stage x); x=3
         self.down_h=nn.Conv2d( inchannel, outchannel,1,bias=False)
         self.down_l=nn.Conv2d( outchannel, outchannel,1,bias=False)
         self.flow_make=nn.Conv2d( outchannel*2,2,kernel_size=3,padding=1,bias=False)
@@ -71,7 +71,7 @@ class Semantic_flow(nn.Module):
         Hh = int(HW_h ** 0.5)
         Hl = int(HW_l ** 0.5)
     
-        # reshape 回 feature map
+        # reshape back to feature map
         h_feature = h_feature.view(B, C, Hh, Hh)
         low_feature = low_feature.view(B, C, Hl, Hl)
     
