@@ -78,7 +78,7 @@ class Semantic_flow(nn.Module):
         h_feature_origin = h_feature
     
         size = Hl
-        # 将high-level 和 low-level feature分别通过两个1x1卷积进行压缩
+        # Using two separate Conv1x1 to compact the high-level & low-level features
         low_feature = self.down_l(low_feature)
         h_feature = self.down_h(h_feature)
         # 将high-level feature进行双线性上采样
