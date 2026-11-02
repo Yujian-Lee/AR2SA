@@ -2082,72 +2082,7 @@ class Mask2FormerMaskedAttentionDecoder(nn.Module):
 
         self.gradient_checkpointing = False
 
-        #################################################
 
-        # self.k_values_feats = [3,7,13]
-        # self.ratios_feats = [1,1,1] # 或者调整为 [0.5, 0.25, 0.15]
-        # # self.sr_ratios = [4,2,1]
-        # self.ctm_layer_feats = nn.ModuleList([
-        #     CTM(sample_ratio=r, embed_dim=256, dim_out=256, k=k) 
-        #     for r, k in zip(self.ratios_feats, self.k_values_feats)
-        # ])
-
-        # self.tcblock = nn.ModuleList([TCBlock(
-        #         dim=256, num_heads=8, mlp_ratio=4, qkv_bias=False, qk_scale=None,
-        #         drop=0., attn_drop=0., drop_path=0., norm_layer=nn.LayerNorm,
-        #         sr_ratio=sr)for sr in self.sr_ratios])
-
-        # self.pre_mask_predictor = Mask2FormerMaskPredictor(
-        #     hidden_size=config.hidden_dim,
-        #     num_heads=self.num_heads,
-        #     mask_feature_size=self.mask_feature_size,
-        # )
-        # self.pre_layers = nn.ModuleList(
-        #     [Mask2FormerMaskedAttentionDecoderLayer(self.config) for _ in range(self.decoder_layers)]
-        # )
-
-
-        
-    # def dpcknn(self, VIS_FEATS):
-    #     VIS_FEATS_CTM = []
-    #     # all_hidden_states = ()
-    #     ratio = [1,1,1]
-    #     for i in range(len(VIS_FEATS)):
-    #         ctm = self.ctm_layer_feats[i]
-    #         # blk = self.tcblock[i]
-    #         visual_features = VIS_FEATS[i]
-    #         K, B, C = visual_features.shape
-    #         H = W = int(math.sqrt(K))
-    #         # x = visual_features.permute(1,0,2)
-    #         # B, N, _ = x.shape
-    #         # device = x.device
-    #         # idx_token = torch.arange(N)[None, :].repeat(B, 1).to(device)
-    #         # agg_weight = x.new_ones(B, N, 1)
-    #         # token_dict = {'x': x,
-    #         #               'token_num': N,
-    #         #               'map_size': [H, W],
-    #         #               'init_grid_size': [H, W],
-    #         #               'idx_token': idx_token,
-    #         #               'agg_weight': agg_weight}
-    #         # token_dict = ctm(token_dict)  # down sample
-    #         # token_dict = blk(token_dict)
-    #         # token_dict['x'] = self.layernorm(token_dict['x'])
-    #         visual_features = visual_features.unsqueeze(-1).reshape(B,C,int(math.sqrt(K)),int(math.sqrt(K)))
-            
-    #         B,C,H,W = visual_features.shape
-    #         N_original = H * W  # 2304
-    #         initial_token_dict = {
-    #             'x': visual_features.flatten(2).transpose(1, 2).contiguous(),
-    #             'map_size': [H, W],
-    #             'init_grid_size': [H, W],
-    #             'token_num': N_original,
-    #             'idx_token': torch.arange(N_original)[None, :].expand(B, -1).cuda()
-    #         }
-    #         token_dict, info_dict = ctm(initial_token_dict)
-
-    #         VIS_FEATS_CTM.append(token_dict['x'].permute(1,0,2))
-
-    #     return VIS_FEATS_CTM
         
     def forward(
         self,
