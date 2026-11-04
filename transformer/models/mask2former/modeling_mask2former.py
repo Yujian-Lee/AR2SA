@@ -3729,19 +3729,7 @@ class Mask2FormerForUniversalSegmentation(Mask2FormerPreTrainedModel):
                 class_labels=class_labels,
                 auxiliary_predictions=auxiliary_logits,
             )
-            # print(loss_dict.keys())
-        # if label_post_mask is not None:
-        #     extraloss_dict = self.get_loss_dict(
-        #         masks_queries_logits=masks_queries_logits[-1],
-        #         class_queries_logits=class_queries_logits[-1],
-        #         mask_labels=label_post_mask,
-        #         class_labels=class_labels,
-        #         auxiliary_predictions=auxiliary_logits
-        #     )
-        #     # print(extraloss_dict.keys())
-        #     # loss_dict['loss_mask'] += extraloss_dict['loss_mask']
-        #     loss = self.get_loss(loss_dict)  + self.get_loss(extraloss_dict)
-        # else:
+            
         loss = self.get_loss(loss_dict)
     
             # loss_dict['loss_mask'] += extraloss_dict['loss_mask']
