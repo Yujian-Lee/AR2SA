@@ -3335,35 +3335,8 @@ class Mask2FormerModel(Mask2FormerPreTrainedModel):
         mask_feat_L = 0
         pre_decoder_L = 0
         
-        # pixel_level_module_output.decoder_hidden_states = list(pixel_level_module_output.decoder_hidden_states)
-        ############改！！！！！！！！
-        # if audio_boost_mask is not None:
-        #     mask_features = pixel_level_module_output.decoder_last_hidden_state + torch.nn.functional.interpolate(
-        #         audio_boost_mask.unsqueeze(1), size=pixel_level_module_output.decoder_last_hidden_state.shape[-2:],
-        #         mode="bilinear")
-        #     if aux_audio_boost_mask is not None:
-        #         mask_features = mask_features + torch.nn.functional.interpolate(
-        #             aux_audio_boost_mask.unsqueeze(1), size=pixel_level_module_output.decoder_last_hidden_state.shape[-2:],
-        #             mode="bilinear")
-        #     if anchor_audio_boost_mask is not None:
-        #         anchor_mask_features = pixel_level_module_output.decoder_last_hidden_state + torch.nn.functional.interpolate(
-        #             anchor_audio_boost_mask.unsqueeze(1), size=pixel_level_module_output.decoder_last_hidden_state.shape[-2:],
-        #             mode="bilinear")
-        #         mask_feat_L = F.mse_loss(mask_features, anchor_mask_features)
         
-        #     else:
-        #         anchor_mask_features = None
-        ############改！！！！！！！！
         if audio_boost_mask is not None:
-            # if aux_audio_boost_mask is not None:
-            #     mask_features_audio = torch.nn.functional.interpolate(audio_boost_mask.unsqueeze(1), size=pixel_level_module_output.decoder_last_hidden_state.shape[-2:],
-            #     mode="bilinear")
-            #     mask_features_aux_audio = torch.nn.functional.interpolate(aux_audio_boost_mask.unsqueeze(1), size=pixel_level_module_output.decoder_last_hidden_state.shape[-2:],
-            #         mode="bilinear")
-            #     mask_features = self.maskparam * mask_features_audio + (1-self.maskparam) * mask_features_aux_audio
-
-            #     mask_features = pixel_level_module_output.decoder_last_hidden_state * (1 + mask_features)
-            # else:
             mask_features = pixel_level_module_output.decoder_last_hidden_state + torch.nn.functional.interpolate(audio_boost_mask.unsqueeze(1), size=pixel_level_module_output.decoder_last_hidden_state.shape[-2:],
                 mode="bilinear")
                 
