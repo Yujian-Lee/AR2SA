@@ -3693,33 +3693,7 @@ class Mask2FormerForUniversalSegmentation(Mask2FormerPreTrainedModel):
 
         auxiliary_logits = self.get_auxiliary_logits(class_queries_logits, masks_queries_logits)
 
-        # print(loss_audio_text)
-        # intersection = []
-        # for i in range(5):
-        #     # intersection.append(pixel_mask[i].to(torch.int) & audio_boost_mask[i].to(torch.int))
-
-        #     intersection.append(torch.where((mask_labels[i].to(torch.int) & audio_boost_mask[i:i+1,:,:].to(torch.int)).bool(), mask_labels[i].to(torch.int) & audio_boost_mask[i:i+1,:,:].to(torch.int), mask_labels[i].to(torch.int) & audio_boost_mask[i:i+1,:,:].to(torch.int)).float())
-        # # mask_labels = mask_labels & audio_boost_mask
         
-        
-        # for i in range(5):
-        #     for j in range(len(mask_labels[i])):
-        #         print(mask_labels[i][j].sum())
-        #这里为什么会加起来是384*384 1 0 都有
-        # 因为有background类的存在 所以1 0 都有
-        
-        # print(masks_queries_logits[-1].shape)
-        
-        # print(extraloss['loss_mask'])
-        # print(len(mask_labels))
-        # print(extraloss)
-
-        # print(mask_labels[0][0].sum()) 104149 background
-        # print(mask_labels[0][1].sum()) 43307 object
-        # print(class_labels[0][0]) 0
-        # print(class_labels[0][1]) 1
-        # print(masks_queries_logits[-1].shape) torch.Size([5, 100, 96, 96])
-        # print(class_queries_logits[-1].shape) torch.Size([5, 100, 72])
         if mask_labels is not None and class_labels is not None:
             # print(class_queries_logits[-1].shape,len(mask_labels),mask_labels[0].shape,class_labels)
             loss_dict = self.get_loss_dict(
