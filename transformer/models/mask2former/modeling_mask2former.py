@@ -3292,25 +3292,7 @@ class Mask2FormerModel(Mask2FormerPreTrainedModel):
         pixel_level_module_output = self.pixel_level_module(
             pixel_values=pixel_values, audio_boost_mask=audio_boost_mask, output_hidden_states=output_hidden_states
         )
-        # pixel_level_module_output_audio = self.pixel_level_module(
-        #     pixel_values=aux_pixel_values_audio, audio_boost_mask=audio_boost_mask, output_hidden_states=output_hidden_states
-        # )
-        # pixel_level_module_output_bg = self.pixel_level_module(
-        #     pixel_values=aux_pixel_values_bg, audio_boost_mask=audio_boost_mask, output_hidden_states=output_hidden_states
-        # )
-        # anchor_pixel_level_module_output_audio = self.pixel_level_module(
-        #     pixel_values=anchor_aux_pixel_values_audio, audio_boost_mask=audio_boost_mask, output_hidden_states=output_hidden_states
-        # )
-        # anchor_pixel_level_module_output_bg = self.pixel_level_module(
-        #     pixel_values=anchor_aux_pixel_values_bg, audio_boost_mask=audio_boost_mask, output_hidden_states=output_hidden_states
-        # )
-        # print(len(pixel_level_module_output.encoder_hidden_states))
-        # print(len(pixel_level_module_output.decoder_hidden_states))
-        # anchor_pixel_level_module_output_encoder, anchor_pixel_level_module_output_decoder = [], []
-        # pixel_level_module_output.encoder_hidden_states,  pixel_level_module_output_audio.encoder_hidden_states, pixel_level_module_output_bg.encoder_hidden_states, anchor_pixel_level_module_output_audio.encoder_hidden_states, anchor_pixel_level_module_output_bg.encoder_hidden_states = list(pixel_level_module_output.encoder_hidden_states), list(pixel_level_module_output_audio.encoder_hidden_states), list(pixel_level_module_output_bg.encoder_hidden_states), list(anchor_pixel_level_module_output_audio.encoder_hidden_states), list(anchor_pixel_level_module_output_bg.encoder_hidden_states)
-
-        # pixel_level_module_output.decoder_hidden_states,  pixel_level_module_output_audio.decoder_hidden_states, pixel_level_module_output_bg.decoder_hidden_states, anchor_pixel_level_module_output_audio.decoder_hidden_states, anchor_pixel_level_module_output_bg.decoder_hidden_states = list(pixel_level_module_output.decoder_hidden_states), list(pixel_level_module_output_audio.decoder_hidden_states), list(pixel_level_module_output_bg.decoder_hidden_states), list(anchor_pixel_level_module_output_audio.decoder_hidden_states), list(anchor_pixel_level_module_output_bg.decoder_hidden_states)
-
+       
         encoder_L = 0
         decoder_L = 0
         # for i in range(4):
@@ -3399,12 +3381,6 @@ class Mask2FormerModel(Mask2FormerPreTrainedModel):
             mask_features = pixel_level_module_output.decoder_last_hidden_state
             anchor_mask_features = None
 
-        # pixel_level_module_output.decoder_hidden_states = tuple(pixel_level_module_output.decoder_hidden_states)
-        # print(mask_features.shape) torch.Size([5, 256, 96, 96])    
-            
-        # print(pixel_level_module_output.decoder_hidden_states[0].shape)
-        
-        #有编码器的最后一层特征图，解码器的最后一层特征图（B*256*96*96），�?output_hidden_states为True，还会返回编码器和解码器的�?�尺度特征图，前两项其实就是后两项的[-1]
         transformer_module_output,loss_audio_text = self.transformer_module(
             prompt_features_projected=prompt_features_projected,
             multi_scale_features=pixel_level_module_output.decoder_hidden_states,#解码器的多尺度特征图
@@ -3711,13 +3687,7 @@ class Mask2FormerForUniversalSegmentation(Mask2FormerPreTrainedModel):
         encoder_hidden_states = None
         pixel_decoder_hidden_states = None
         transformer_decoder_hidden_states = None
-        
-        # print(outputs.pixel_decoder_hidden_states[-1].shape)
-        # input('hidden')
 
-            
-
-        
         if output_hidden_states:
             encoder_hidden_states = outputs.encoder_hidden_states
             pixel_decoder_hidden_states = outputs.pixel_decoder_hidden_states
