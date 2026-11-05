@@ -2593,86 +2593,6 @@ class Mask2FormerTransformerModule(nn.Module):
         self.upsample_24_TO_12 = Semantic_flow(256,256)
         self.upsample_48_TO_24 = Semantic_flow(256,256)
     
-        ##############################################################
-
-
-    # def token_downup(self, target_dict, source_dict):
-    #     """Transform token features between different distribution.
-    
-    #     Returns:
-    #         x_out (Tensor[B, N, C]): token features.
-    
-    #     Args:
-    #         target_dict (dict): dict for target token information
-    #         source_dict (dict): dict for source token information.
-    #     """
-    
-    #     x_s = source_dict['x']
-    #     idx_token_s = source_dict['idx_token']
-    #     idx_token_t = target_dict['idx_token']
-    #     T = target_dict['token_num']
-    #     B, S, C = x_s.shape
-    #     N_init = idx_token_s.shape[1]
-    
-    #     weight = target_dict['agg_weight'] if 'agg_weight' in target_dict.keys() else None
-    #     if weight is None:
-    #         weight = x_s.new_ones(B, N_init, 1)
-    #     weight = weight.reshape(-1)
-    
-    #     # choose the way with fewer flops.
-    #     if N_init < T * S:
-    #         # use sparse matrix multiplication
-    #         # Flops: B * N_init * (C+2)
-    #         idx_token_t = idx_token_t + torch.arange(B, device=x_s.device)[:, None] * T
-    #         idx_token_s = idx_token_s + torch.arange(B, device=x_s.device)[:, None] * S
-    #         coor = torch.stack([idx_token_t, idx_token_s], dim=0).reshape(2, B * N_init)
-    
-    #         # torch.sparse.spmm does not support fp16
-    #         with torch.cuda.amp.autocast(enabled=False):
-    #             # torch.sparse does not support grad for sparse matrix
-    #             weight = weight.float().detach()
-    #             # build a matrix with shape [B*T, B*S]
-    #             A = torch.sparse.FloatTensor(coor, weight, torch.Size([B * T, B * S]))
-    #             # normalize the matrix
-    #             all_weight = A.type(torch.float32) @ x_s.new_ones(B * S, 1).type(torch.float32) + 1e-6
-    #             weight = weight / all_weight[(idx_token_t).reshape(-1), 0]
-    #             A = torch.sparse.FloatTensor(coor, weight, torch.Size([B * T, B * S]))
-    #             # sparse matmul
-    #             x_out = A.type(torch.float32) @ x_s.reshape(B * S, C).type(torch.float32)
-    #     else:
-    #         # use dense matrix multiplication
-    #         # Flops: B * T * S * (C+2)
-    #         idx_batch = torch.arange(B, device=x_s.device)[:, None].expand(B, N_init)
-    #         coor = torch.stack([idx_batch, idx_token_t, idx_token_s], dim=0).reshape(3, B * N_init)
-    #         weight = weight.detach()  # detach to reduce training time
-    #         # build a matrix with shape [B, T, S]
-    #         A = torch.sparse.FloatTensor(coor, weight, torch.Size([B, T, S])).to_dense()
-    #         # normalize the matrix
-    #         A = A / (A.sum(dim=-1, keepdim=True) + 1e-6)
-    #         # dense matmul
-    #         x_out = A @ x_s
-    
-    #     x_out = x_out.reshape(B, T, C).type(x_s.dtype)
-    #     return x_out
-    # def aggregate_pos_by_cluster(self, pos, idx_cluster, cluster_num):
-    #     """
-    #     Args:
-    #         pos: [N, B, C] 原始位置编码
-    #         idx_cluster: [B, N] 每个 token 属于哪个簇的索引
-    #         cluster_num: P (下采样后的簇数量)
-    #     """
-    #     B, N, C = pos.shape
-    #     device = pos.device
-
-    #     sum_pos = torch.zeros(B, cluster_num, C, device=device)
-    #     count = torch.zeros(B, cluster_num, 1, device=device)
-    #     idx_expand = idx_cluster.unsqueeze(-1).expand(B, N, C)
-    #     sum_pos.scatter_add_(1, idx_expand, pos)
-    #     ones = torch.ones(B, N, 1, device=device)
-    #     count.scatter_add_(1, idx_cluster.unsqueeze(-1), ones)
-    #     downsampled_pos = sum_pos / (count + 1e-6)
-    #     return downsampled_pos.permute(1, 0, 2)      
-
     def dpcknn(self, query_features, query_embeddings, VIS_FEATS, VIS_FEATS_pos, attention_mask, mask_features, size_list, intermediate_mask_predictions,  
                intermediate, select):
         VIS_FEATS_CTM = []
@@ -2700,29 +2620,6 @@ class Mask2FormerTransformerModule(nn.Module):
                 'idx_token': torch.arange(N_original)[None, :].expand(B, -1).cuda()
             }
             token_dict, info_dict = ctm(initial_token_dict)
-
-
-            # B, N, _ = x.shape
-            # device = x.device
-            # idx_token = torch.arange(N)[None, :].repeat(B, 1).to(device)
-            # agg_weight = x.new_ones(B, N, 1)
-            # token_dict = {'x': x,
-            #               'token_num': N,
-            #               'map_size': [H, W],
-            #               'init_grid_size': [H, W],
-            #               'idx_token': idx_token,
-            #               'agg_weight': agg_weight}
-
-
-            # token_dict = ctm(token_dict)  # down sample
-            # token_dict = blk(token_dict)
-            
-            # token_dict['x'] = self.layernorm(token_dict['x'])
-
-            # print(token_dict['x'].shape)  # print(token_dict['x'].shape) torch.Size([5, 36, 256]) torch.Size([5, 144, 256]) torch.Size([5, 576, 256])
-
-            # blk = self.tcblock[i]
-
             
             VIS_FEATS_CTM.append(token_dict['x'].permute(1,0,2))
             VIS_FEATS_CTM_pos=VIS_FEATS_pos#.append(VIS_FEATS_pos)
