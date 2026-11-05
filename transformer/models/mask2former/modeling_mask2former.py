@@ -785,15 +785,7 @@ class Mask2FormerLoss(nn.Module):
 
         # Get random point coordinates
         point_coordinates = torch.rand(num_boxes, num_points_sampled, 2, device=logits.device)
-        # Get sampled prediction value for the point coordinates
-        #point_coordinates=torch.zeros([num_boxes,num_points_sampled,2], dtype=torch.long, device=logits.device)
-        #for i in range(num_boxes):
-           # if all==1:
-               # point_coordinates[i,:,:] = torch.rand( num_points_sampled, 2, device=logits.device)
-            #else:
-               # indices=torch.nonzero(gtmask[i,0], as_tuple=False)
-               # point_coordinates[i,:,:]=indices[random.choices(range(indices.shape[0]), k=num_points_sampled)]/384
-            
+       
         point_logits = sample_point(logits, point_coordinates, align_corners=False)
         # Calculate the uncertainties based on the sampled prediction values of the points
         point_uncertainties = uncertainty_function(point_logits)
@@ -1713,14 +1705,10 @@ class Mask2FormerMaskedAttentionDecoderLayer(nn.Module):
             attention_mask=None,
             output_attentions=True,
         )
-        # print(hidden_states.shape) torch.Size([100, 5, 256])
-        # print(self_attn_weights.shape) torch.Size([5, 8, 100, 100])
-        # print("***")
+
         hidden_states = nn.functional.dropout(hidden_states, p=self.dropout, training=self.training)
         hidden_states = residual + hidden_states
         hidden_states = self.self_attn_layer_norm(hidden_states)
-
-        # Fully Connected
         residual = hidden_states
         hidden_states = self.activation_fn(self.fc1(hidden_states))
         hidden_states = nn.functional.dropout(hidden_states, p=self.activation_dropout, training=self.training)
@@ -2400,34 +2388,6 @@ class Mask2FormerTransformerModule(nn.Module):
         ])
         for mask in self.learn_masks:
             nn.init.normal_(mask, std=0.01)
-
-        
-
-        ##############################################################
-    
-        # self.k_values_feats = [3,7,13]
-        # self.ratios_feats = [1,1,1] # 或者调整为 [0.5, 0.25, 0.15]
-        # # self.sr_ratios = [4,2,1]
-        # self.ctm_layer_feats = nn.ModuleList([
-        #     CTM(sample_ratio=r, embed_dim=256, dim_out=256, k=k) 
-        #     for r, k in zip(self.ratios_feats, self.k_values_feats)
-        # ])
-
-        # # self.tcblock = nn.ModuleList([TCBlock(
-        # #         dim=256, num_heads=8, mlp_ratio=4, qkv_bias=False, qk_scale=None,
-        # #         drop=0., attn_drop=0., drop_path=0., norm_layer=nn.LayerNorm,
-        # #         sr_ratio=sr)for sr in self.sr_ratios])
-
-        # self.prelayers = nn.ModuleList(
-        #     [REF_Forward(self.config) for _ in range(9)]
-        # )
-        # self.premask_predictor = Mask2FormerMaskPredictor(
-        #     hidden_size=config.hidden_dim,
-        #     num_heads=8,
-        #     mask_feature_size=config.mask_feature_size,
-        # )
-        # self.layernorm = nn.LayerNorm(config.hidden_dim)      
-
 
         self.upsample_24_TO_12 = Semantic_flow(256,256)
         self.upsample_48_TO_24 = Semantic_flow(256,256)
