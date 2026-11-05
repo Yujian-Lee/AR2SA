@@ -2592,22 +2592,12 @@ class Mask2FormerTransformerModule(nn.Module):
                 H, W = size_list[-1]
                 position_embed = self.position_embedder(multi_scale_features[i], None).flatten(2).permute(0, 2, 1) # [B, HW, C]
                 audio_prompt = nn.functional.interpolate(audio_boost_mask.unsqueeze(1), size=size_list[-1], mode="bilinear").flatten(2).squeeze(1) # [B, HW]
-                # anchor_audio_prompt = nn.functional.interpolate(anchor_audio_boost_mask.unsqueeze(1), size=size_list[-1], mode="bilinear").flatten(2).squeeze(1)
-                # pred = (audio_prompt*self.learn_masks[i]).sigmoid()
-                # target = anchor_audio_prompt
-                # intersection = (pred * target).sum(dim=1)
-                # union = pred.sum(dim=1) + target.sum(dim=1)
-                # multi_diceloss = 1 - (2 * intersection + eps) / (union + eps)
-                # multiSales_diceloss += multi_diceloss.mean()
-                # 2. 全局统计量计算 (利用 Batch 中所有非黑帧来稳健协方差)
+
                 all_mask_s = audio_prompt <= low
                 all_mask_a = audio_prompt >= high
-
                 # 收集整个 Batch 的特征用于计算协方差
                 all_s_feat = position_embed[all_mask_s]
                 all_a_feat = position_embed[all_mask_a]
-                
-                # 默认 inv_cov (防止整个 batch 全黑导致报错)
                 inv_cov = torch.eye(position_embed.shape[-1], device=position_embed.device)
                 
                 if all_a_feat.shape[0] > 10: # 如果 batch 内有足够的物体像素
@@ -2632,10 +2622,6 @@ class Mask2FormerTransformerModule(nn.Module):
                 diff_x = torch.abs(m[:,:,:,:-1]-m[:,:,:,1:])
                 diff_y = torch.abs(m[:,:,:-1,:]-m[:,:,1:,:])
                 loss_conf += (2*((diff_x*u[:,:,:,:-1]).mean()+(diff_y*u[:,:,:-1,:]).mean()))
-
-
-
-                
                 batch_size = position_embed.shape[0]
                 for b in range(batch_size):
                     b_prompt = audio_prompt[b] # (HW,)
@@ -2655,11 +2641,8 @@ class Mask2FormerTransformerModule(nn.Module):
                     s_Feat = b_feat[b_mask_s]
                     a_Feat = b_feat[b_mask_a]
                     u_Feat = b_feat[b_mask_u]
-
-                    
-                    
                     if s_Feat.shape[0] < 5: 
-                        continue # 安全检查
+                        continue
             
                     s_center = s_Feat.mean(0, keepdim=True)
                     a_center = a_Feat.mean(0, keepdim=True)
@@ -2681,23 +2664,7 @@ class Mask2FormerTransformerModule(nn.Module):
                         pull_dist = torch.min(d_to_s, d_to_a)
                         push_dist = torch.max(d_to_s, d_to_a)
                         loss_mmd += (pull_dist / (push_dist + 1e-6)).mean() / batch_size
-                        # 把 pull_dist和 push_dist改成以下  -> 不行 上面的是（72.5 81.3）
-                        # pos = anchor_audio_prompt
-                        # neg = 1 - anchor_audio_prompt
-                        # pull = pos * d_to_a + neg * d_to_s
-                        # push = pos * d_to_s + neg * d_to_a
                         
-                        # loss_mmd += (pull / (push + 1e-6)).mean()
-                    
-
-                        # loss_mmd += F.softplus(d_to_s - d_to_a).mean() / batch_size
-                        
-                        # 使用全局 inv_cov 计算马氏距离 （72.3 82.8）
-                        # diff_s = u_Feat - s_center
-                        # diff_a = u_Feat - a_center
-                        # d_to_s = torch.sqrt(torch.sum((diff_s @ inv_cov) * diff_s, dim=-1))
-                        # d_to_a = torch.sqrt(torch.sum((diff_a @ inv_cov) * diff_a, dim=-1
-            
                     # 类间距惩罚 (让物体中心与背景中心拉开) 欧式距离
                     diff_centers = s_center - a_center
                     d_cluster = torch.sqrt(torch.sum((diff_centers @ inv_cov) * diff_centers, dim=-1)).mean()
@@ -2718,31 +2685,7 @@ class Mask2FormerTransformerModule(nn.Module):
                     + self.level_embed.weight[i][None, :, None]
                 )
                 multi_stage_features[-1] = multi_stage_features[-1].permute(2, 0, 1)
-                entropy_map_list.append(entropy_map)
-                # print(multi_stage_features[0].shape)             
-
-                # multi_feat = (self.input_projections[i](multi_scale_features[i]).flatten(2) + self.level_embed.weight[i][None, :, None])
-                # multi_stage_features.append(multi_feat)
-                # proj_feat = multi_feat.permute(0,2,1)  + position_embed
-                # B, HW, C = proj_feat.shape
-                # obj_mask = (audio_prompt >= high).float().unsqueeze(-1).detach() # [B, HW, 1]
-                # bg_mask = (audio_prompt <= low).float().unsqueeze(-1).detach()   # [B, HW, 1]
-                # obj_count = obj_mask.sum(dim=1) # [B, 1]
-                # bg_count = bg_mask.sum(dim=1)   # [B, 1]
-                # feat_obj_center = (proj_feat * obj_mask).sum(dim=1) / (obj_count + 1e-6) # [B, C]
-                # feat_bg_center = (proj_feat * bg_mask).sum(dim=1) / (bg_count + 1e-6)   # [B, C]
-                # # if audio_emb.shape[-1] != C:
-                # #     # 如果维度不一致，这里通常需要一个小的 projector 或 linear 层
-                # #     return torch.tensor(0.0, device=proj_feat.device)
-                # tmp = prompt_features_projected.squeeze(0)
-                # loss_align = F.cosine_similarity(feat_obj_center, tmp, dim=-1)
-                # loss_sep = F.cosine_similarity(feat_obj_center, feat_bg_center, dim=-1)
-                # valid_mask = (obj_count.squeeze(-1) > 5).float()
-                # final_loss = ((-loss_align + 0.1 * loss_sep) * valid_mask).sum() / (valid_mask.sum() + 1e-6)
-
-                
-                
-                
+                entropy_map_list.append(entropy_map)       
                 
         else:
             for i in range(self.num_feature_levels):
