@@ -2011,44 +2011,7 @@ class Mask2FormerMaskedAttentionDecoder(nn.Module):
             #     attention_mask[torch.where(audio_boost_mask <0.5)] = True
             #     attention_mask[torch.where(audio_boost_mask >=0.5)] = False
 
-        # if audio_boost_mask is not None:
-
-        #     audio_boost_mask = nn.functional.interpolate(
-        #         audio_boost_mask.unsqueeze(1),
-        #         size=feature_size_list[0],
-        #         mode="bilinear"
-        #     ).unsqueeze(1).repeat(1, self.num_heads, inputs_embeds.shape[0], 1, 1)\
-        #      .flatten(0,1).flatten(2)
-        
-        #     if aux_audio_boost_mask is not None:
-        #         aux_audio_boost_mask = nn.functional.interpolate(
-        #             aux_audio_boost_mask.unsqueeze(1),
-        #             size=feature_size_list[0],
-        #             mode="bilinear"
-        #         ).unsqueeze(1).repeat(1, self.num_heads, inputs_embeds.shape[0], 1, 1)\
-        #          .flatten(0,1).flatten(2)
-        
-        #         # 融合两个mask
-        #         final_mask = torch.maximum(audio_boost_mask, aux_audio_boost_mask)
-        
-        #     else:
-        #         final_mask = audio_boost_mask
-        
-        # attention_mask[torch.where(final_mask < 0.5)] = True
-        # attention_mask[torch.where(final_mask >=0.5)] = False
-                
-            
-            
-
-            # pre_attention_mask[torch.where(audio_boost_mask < 0.5)] = True
-            # pre_attention_mask[torch.where(audio_boost_mask >= 0.5)] = False
-        
         intermediate_mask_predictions += (predicted_mask,)
-        # pre_intermediate_mask_predictions += (pre_predicted_mask,)
-        #########################################################
-        # aux_multi_stage_features = self.dpcknn(encoder_hidden_states)
-        #########################################################
-        # print(feature_size_list)
         for idx, decoder_layer in enumerate(self.layers):
             if output_hidden_states:
                 all_hidden_states += (hidden_states,)
@@ -2111,54 +2074,7 @@ class Mask2FormerMaskedAttentionDecoder(nn.Module):
             if output_attentions:
                 attentions += (layer_outputs[1],)
                 # pre_attentions += (pre_layer_outputs[1],)
-                
-        
-        # combined_intermediate = tuple(a + b for a, b in zip(pre_intermediate, intermediate))
-        # combined_intermediate_mask_predictions = tuple(a + b for a, b in zip(pre_intermediate_mask_predictions, intermediate_mask_predictions))
-        ##############################################################################################################################################
-        # if anchor_pixel_embeddings is not None: 
-        #     with torch.no_grad():
-        #         anchor_intermediate += (self.layernorm(inputs_embeds),)
-        #         anchor_predicted_mask, anchor_attention_mask = self.mask_predictor(
-        #             self.layernorm(inputs_embeds), anchor_pixel_embeddings, feature_size_list[0]
-        #         )         
-        #         anchor_audio_boost_mask = nn.functional.interpolate(
-        #                 anchor_audio_boost_mask.unsqueeze(1), size=feature_size_list[0], mode="bilinear"
-        #             ).unsqueeze(1).repeat(1, self.num_heads, inputs_embeds.shape[0], 1, 1).flatten(0, 1).flatten(2)  # (b*nh)*q*hw
-        #         anchor_attention_mask[torch.where(audio_boost_mask <0.5)] = True
-        #         anchor_attention_mask[torch.where(audio_boost_mask >=0.5)] = False
-                
-        #         anchor_intermediate_mask_predictions += (anchor_predicted_mask,)
-        #         for idx, decoder_layer in enumerate(self.layers):
-        #             level_index = idx % self.num_feature_levels
-        #             anchor_attention_mask[torch.where(anchor_attention_mask.sum(-1) == anchor_attention_mask.shape[-1])] = False
-    
-        #             anchor_layer_outputs = decoder_layer(
-        #                 hidden_states,
-        #                 level_index=level_index,
-        #                 position_embeddings=anchor_multi_stage_positional_embeddings,
-        #                 query_position_embeddings=query_position_embeddings,
-        #                 encoder_hidden_states=anchor_encoder_hidden_states,
-        #                 encoder_attention_mask=anchor_attention_mask,
-        #                 output_attentions=output_attentions,
-        #             )
-    
-        #             anchor_intermediate_hidden_states = self.layernorm(anchor_layer_outputs[0])
-    
-        #             anchor_predicted_mask, anchor_attention_mask = self.mask_predictor(
-        #                 anchor_intermediate_hidden_states,
-        #                 anchor_pixel_embeddings,
-        #                 feature_size_list[(idx + 1) % self.num_feature_levels],
-        #             )
-    
-        #             anchor_intermediate_mask_predictions += (anchor_predicted_mask,)
-    
-        #             # add intermediate hidden states with layer norm applied which will be used for predicting class logits
-        #             anchor_intermediate += (anchor_intermediate_hidden_states,)
 
-        #     combined_anchor_intermediate = tuple(a + b for a, b in zip(pre_anchor_intermediate, anchor_intermediate))
-        #     combined_anchor_intermediate_mask_predictions = tuple(a + b for a, b in zip(pre_anchor_intermediate_mask_predictions, anchor_intermediate_mask_predictions))
-            
         
         if output_hidden_states:#True
             all_hidden_states += (hidden_states,)
