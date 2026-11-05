@@ -2988,51 +2988,6 @@ class Mask2FormerTransformerModule(nn.Module):
                 multi_stage_positional_embeddings[-1] = multi_stage_positional_embeddings[-1].permute(2, 0, 1)
                 multi_stage_features[-1] = multi_stage_features[-1].permute(2, 0, 1)
 
-        # print(multi_stage_features[0].shape) C B HW
-        # stage_tokens = [f.permute(1,0,2) for f in multi_stage_features]  # C B HW → B,C,HW?
-        # #归一化到 Poincare ball
-        # stage_tokens = [F.normalize(f, dim=-1) * 0.9 for f in stage_tokens]
-        
-        
-        # fine,mid,coarse = stage_tokens[0],stage_tokens[1],stage_tokens[2]
-        # coarse_node = coarse.mean(1, keepdim=True)
-        # mid_node = mid.mean(1, keepdim=True)
-        # x2 = torch.sum(mid * mid, dim=-1, keepdim=True)
-        # y2 = torch.sum(coarse_node  * coarse_node , dim=-1, keepdim=True)
-        # xy = torch.sum(mid * coarse_node, dim=-1, keepdim=True)
-        # num = (1 + 2 * xy + y2) * mid + (1 - x2) * coarse_node
-        # denom = 1 + 2 * xy + x2 * y2 + eps
-        # mid_reason = num / denom
-
-        # x2 = torch.sum(fine * fine, dim=-1, keepdim=True)
-        # y2 = torch.sum(mid_node * mid_node, dim=-1, keepdim=True)
-        # xy = torch.sum(fine * mid_node, dim=-1, keepdim=True)
-        # num = (1 + 2 * xy + y2) * fine + (1 - x2) * mid_node
-        # denom = 1 + 2 * xy + x2 * y2 + eps
-        # fine_reason = num / denom
-
-        # entropy_fine = entropy_map_list[0].unsqueeze(-1)
-        # entropy_mid = entropy_map_list[1].unsqueeze(-1)
-    
-        # entropy_fine = entropy_fine / (entropy_fine.mean(dim=1,keepdim=True)+1e-6)
-        # entropy_mid = entropy_mid / (entropy_mid.mean(dim=1,keepdim=True)+1e-6)
-    
-        # entropy_fine = torch.clamp(entropy_fine,0,2)
-        # entropy_mid = torch.clamp(entropy_mid,0,2)
-    
-        # mid = mid + entropy_mid * mid_reason
-        # fine = fine + entropy_fine * fine_reason
-    
-        # stage_tokens[0] = fine
-        # stage_tokens[1] = mid
-    
-        # # B,HW,C → B,C,HW
-        # stage_features = [stage_tokens[i].permute(1,0,2)for i in range(len(stage_tokens))]
-        # multi_stage_features = stage_features
-
-        # print(multi_stage_positional_embeddings[0].shape) 144,5,256
-        # print(multi_stage_features[0].shape) torch.Size([144, 5, 256])
-
         multi_stage_features[0] = entropy_map_list[0].permute(1,0).unsqueeze(-1) * multi_stage_features[0] + 0.1 * self.upsample_24_TO_12(multi_stage_positional_embeddings[1].permute(1,2,0),multi_stage_features[0].permute(1,2,0)).permute(2,0,1)
         multi_stage_features[1] = entropy_map_list[1].permute(1,0).unsqueeze(-1) * multi_stage_features[1] + 0.1 * self.upsample_48_TO_24(multi_stage_positional_embeddings[2].permute(1,2,0),multi_stage_features[1].permute(1,2,0)).permute(2,0,1)
 
@@ -3041,14 +2996,7 @@ class Mask2FormerTransformerModule(nn.Module):
         feat = feat.permute(1, 2, 0).reshape(5, 256, 12, 12)
         
         feat_mean = feat.mean(dim=1)  # [B, H, W]
-        
-    
-        
 
-
-                
-                
-        # print(anchor_L_audio)
         _, batch_size, _ = multi_stage_features[0].shape
 
         # [num_queries, batch_size, num_channels]
