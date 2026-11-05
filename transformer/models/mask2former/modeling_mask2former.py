@@ -2104,33 +2104,7 @@ class Mask2FormerMaskedAttentionDecoder(nn.Module):
                 # add intermediate hidden states with layer norm applied which will be used for predicting class logits
                 intermediate += (intermediate_hidden_states,)
 
-
-
-                ################################################################################
-                # pre_attention_mask[torch.where(pre_attention_mask.sum(-1) == pre_attention_mask.shape[-1])] = False
-
-                # pre_layer_outputs = self.pre_layers[idx](
-                #     pre_hidden_states,
-                #     level_index=level_index,
-                #     position_embeddings=multi_stage_positional_embeddings,
-                #     query_position_embeddings=query_position_embeddings,
-                #     encoder_hidden_states=aux_multi_stage_features,
-                #     encoder_attention_mask=pre_attention_mask,
-                #     output_attentions=output_attentions,
-                # )
-
-                # pre_intermediate_hidden_states = self.layernorm(pre_layer_outputs[0])
-
-                # pre_predicted_mask, pre_attention_mask = self.pre_mask_predictor(
-                #     pre_intermediate_hidden_states,
-                #     pixel_embeddings,
-                #     feature_size_list[(idx + 1) % self.num_feature_levels],
-                # )
-
-                # pre_intermediate_mask_predictions += (pre_predicted_mask,)
-                # pre_intermediate += (pre_intermediate_hidden_states,)
-                ################################################################################
-
+                
             hidden_states = layer_outputs[0]
             # pre_hidden_states = pre_layer_outputs[0]
             # print(output_attentions) # FALSE
