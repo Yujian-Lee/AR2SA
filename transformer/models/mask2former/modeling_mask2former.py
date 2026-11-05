@@ -3293,45 +3293,6 @@ class Mask2FormerModel(Mask2FormerPreTrainedModel):
             pixel_values=pixel_values, audio_boost_mask=audio_boost_mask, output_hidden_states=output_hidden_states
         )
        
-        encoder_L = 0
-        decoder_L = 0
-        # for i in range(4):
-        #     pixel_level_module_output.encoder_hidden_states[i] = pixel_level_module_output.encoder_hidden_states[i] - pixel_level_module_output_bg.encoder_hidden_states[i] + pixel_level_module_output_audio.encoder_hidden_states[i]
-        #     anchor_pixel_level_module_output_encoder_i = pixel_level_module_output.encoder_hidden_states[i] - anchor_pixel_level_module_output_bg.encoder_hidden_states[i] + anchor_pixel_level_module_output_audio.encoder_hidden_states[i]
-        #     encoder_L += F.mse_loss(pixel_level_module_output.encoder_hidden_states[i], anchor_pixel_level_module_output_encoder_i)
-        # for i in range(3):
-        #     pixel_level_module_output.decoder_hidden_states[i] = pixel_level_module_output.decoder_hidden_states[i] - pixel_level_module_output_bg.decoder_hidden_states[i] + pixel_level_module_output_audio.decoder_hidden_states[i]
-        #     anchor_pixel_level_module_output_decoder_i = pixel_level_module_output.decoder_hidden_states[i] - anchor_pixel_level_module_output_bg.decoder_hidden_states[i] + anchor_pixel_level_module_output_audio.decoder_hidden_states[i]
-        #     decoder_L += F.mse_loss(pixel_level_module_output.decoder_hidden_states[i], anchor_pixel_level_module_output_decoder_i)
-
-        
-            
-        # pixel_level_module_output.decoder_last_hidden_state = pixel_level_module_output.decoder_last_hidden_state - pixel_level_module_output_bg.decoder_last_hidden_state + pixel_level_module_output_audio.decoder_last_hidden_state
-        # pixel_level_module_output.encoder_hidden_states, pixel_level_module_output.decoder_hidden_states = tuple(pixel_level_module_output.encoder_hidden_states), tuple(pixel_level_module_output.decoder_hidden_states)
-        # aux_pixel_level_module_output = self.pixel_level_module(
-        #     pixel_values=aux_pixel_values, output_hidden_states=output_hidden_states
-        # )
-
-        
-
-
-        ###########
-        # VIS_FEAT = list(pixel_level_module_output.decoder_hidden_states)
-        # VIS_FEAT.append(pixel_level_module_output.decoder_last_hidden_state)
-        
-        # visualfeat = self.dpcknn(pixel_level_module_output.decoder_hidden_states,prompt_features_projected)
-        # hidden_states_list = list(pixel_level_module_output.decoder_hidden_states)
-        # hidden_states_list[0] = visualfeat[0] 
-        # hidden_states_list[1] = visualfeat[1] 
-        # hidden_states_list[2] = visualfeat[2]
-        # dpcknn_scale_features = hidden_states_list
-        
-        # pixel_level_module_output.decoder_last_hidden_state = visualfeat[3]
-        # print(pixel_level_module_output.encoder_hidden_states[0].shape) torch.Size([5, 128, 96, 96])
-        # print(pixel_level_module_output.encoder_hidden_states[1].shape) torch.Size([5, 256, 48, 48])
-        # print(pixel_level_module_output.encoder_hidden_states[2].shape) torch.Size([5, 512, 24, 24])
-        ###########
-        # pixel_level_module_output.decoder_last_hidden_state = self.dpcknn(pixel_level_module_output.decoder_last_hidden_state,prompt_features_projected)
         mask_feat_L = 0
         pre_decoder_L = 0
         
@@ -3402,7 +3363,7 @@ class Mask2FormerModel(Mask2FormerPreTrainedModel):
         if not return_dict:
             output = tuple(v for v in output.values() if v is not None)
         
-        return output,mask_feat_L+encoder_L+decoder_L+loss_audio_text
+        return output,mask_feat_L+loss_audio_text
 
 
 @add_start_docstrings(
