@@ -2401,66 +2401,7 @@ class Mask2FormerTransformerModule(nn.Module):
         for mask in self.learn_masks:
             nn.init.normal_(mask, std=0.01)
 
-        # self.auxaudio_emb = nn.Embedding(1,hidden_dim)
-        # self.auxsilence_emb = nn.Embedding(1,hidden_dim)
-        # self.aux_learn_masks = nn.ParameterList([
-        #     nn.Parameter(torch.zeros(5, 144)),
-        #     nn.Parameter(torch.zeros(5, 576)),
-        #     nn.Parameter(torch.zeros(5, 2304))
-        # ])
-        # for mask in self.aux_learn_masks:
-        #     nn.init.normal_(mask, std=0.01)
-
-        # self.maskparam = nn.ParameterList([
-        #     nn.Parameter(torch.tensor(1.0)),
-        #     nn.Parameter(torch.tensor(1.0)),
-        #     nn.Parameter(torch.tensor(1.0))
-        # ])
-
-    
-        # self.uncertain_audio_embed=nn.Embedding(1, hidden_dim)
-        # self.uncertain_silence_embed=nn.Embedding(1, hidden_dim)
-        # nn.init.normal_(self.audio_embed.weight, std=0.02)
-        # nn.init.normal_(self.uncertain_embed.weight, std=0.02)
-    #     nn.init.normal_(self.silence_embed.weight, std=0.02)
-    #     self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
-
-    #     self.learn_masks = nn.ParameterList([
-    #     nn.Parameter(torch.zeros(5, 144)),
-    #     nn.Parameter(torch.zeros(5, 576)),
-    #     nn.Parameter(torch.zeros(5, 2304))
-    # ])
-    #     for mask in self.learn_masks:
-    #         nn.init.normal_(mask, std=0.01)
         
-        # nn.init.normal_(self.uncertain_audio_embed.weight, std=0.02)
-        # nn.init.normal_(self.uncertain_silence_embed.weight, std=0.02)
-
-        # self.highcon_audio_embed=nn.Embedding(1, hidden_dim)
-        # self.highcon_silence_embed=nn.Embedding(1, hidden_dim)
-        # self.higcon_uncertain_embed=nn.Embedding(1,hidden_dim)
-        
-        # self.ref_avs_attn = REF_AVS_Transformer()
-
-
-        # self.firstlevel_embed = nn.Parameter(torch.empty(5, 256, 12,12))
-        # nn.init.kaiming_uniform_(self.firstlevel_embed, a=math.sqrt(5))
-        # self.secondlevel_embed = nn.Parameter(torch.empty(5, 256, 24,24))
-        # nn.init.kaiming_uniform_(self.secondlevel_embed, a=math.sqrt(5))
-        # self.thirdlevel_embed = nn.Parameter(torch.empty(5, 256, 48,48))
-        # nn.init.kaiming_uniform_(self.thirdlevel_embed, a=math.sqrt(5))
-
-        # self.ref_avs_0 = REF_AVS_Transformer()
-        # self.ref_avs_1 = REF_AVS_Transformer()
-        # self.ref_avs_2 = REF_AVS_Transformer()
-        # self.k_values = [2, 2, 2]
-        # self.ratios = [0.25, 0.25, 0.25] # 或者调整为 [0.5, 0.25, 0.15]
-        
-        # self.ctm_layer = nn.ModuleList([
-        #     CTM(sample_ratio=r, embed_dim=256, dim_out=256, k=k) 
-        #     for r, k in zip(self.ratios, self.k_values)
-        # ])
-
 
         ##############################################################
     
