@@ -1481,24 +1481,6 @@ class Mask2FormerPixelLevelModule(nn.Module):
         
     def forward(self, pixel_values: Tensor, audio_boost_mask, output_hidden_states: bool = False) -> Mask2FormerPixelLevelModuleOutput:
         backbone_features = self.encoder(pixel_values).feature_maps
-        # print(len(backbone_features)) 4
-        # print(backbone_features[0].shape) torch.Size([5, 128, 96, 96])
-        # print(backbone_features[1].shape) torch.Size([5, 256, 48, 48])
-        # print(backbone_features[2].shape) torch.Size([5, 512, 24, 24])
-        # print(backbone_features[3].shape) torch.Size([5, 1024, 12, 12])
-        
-        # backbone_features = list(backbone_features)
-        # audio_list = [audio_ori.view(5,1,128),audio.view(5,1,256)]
-        # backbone_features_0_1 = [backbone_features[0], backbone_features[1]]
-        # backbone_features_0_1 = self.dpcknn(backbone_features_0_1, audio_list)
-        # backbone_features[0] = backbone_features_0_1[0]
-        # backbone_features[1] = backbone_features_0_1[1]
-        # backbone_features = list(backbone_features)
-        # for i in range(3):
-        #         backbone_features[i+1] = backbone_features[i+1] + torch.nn.functional.interpolate(
-        #         audio_boost_mask.unsqueeze(1), size=backbone_features[i+1].shape[-2:],
-        #         mode="bilinear")
- 
         decoder_output = self.decoder(backbone_features, output_hidden_states=output_hidden_states)
 
         return Mask2FormerPixelLevelModuleOutput(
