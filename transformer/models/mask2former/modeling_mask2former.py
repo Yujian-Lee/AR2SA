@@ -2467,16 +2467,7 @@ class Mask2FormerTransformerModule(nn.Module):
             pre_intermediate_mask_predictions=pre_intermediate_mask_predictions,
             pre_intermediate=pre_intermediate,
             aux_audio_boost_mask=aux_audio_boost_mask,
-            # pre_anchor_intermediate_mask_predictions=anchor_pre_intermediate_mask_predictions,
-            # pre_anchor_intermediate=anchor_pre_intermediate,
-            # aux_multi_stage_features=aux_multi_stage_features,
-            # aux_multi_stage_positional_embeddings=aux_multi_stage_positional_embeddings,
-            # aux_mask_features=aux_mask_features,
-            # pre_inputs_embeds=pre_query_features,
-            # pre_all_hidden_states=pre_all_hidden_states,
-
         )
-        # print(anchor_L_audio)
         loss_audio_text = loss_conf + loss_mmd + multiSales_diceloss# + final_loss#+ loss_feat_dist + loss_tv
 
         return decoder_output,loss_audio_text
