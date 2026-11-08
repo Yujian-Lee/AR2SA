@@ -2180,15 +2180,6 @@ class Mask2FormerTransformerModule(nn.Module):
 
         self.decoder = Mask2FormerMaskedAttentionDecoder(config=config)
         self.level_embed = nn.Embedding(self.num_feature_levels, hidden_dim)
-        # self.audio_embed_0=nn.Embedding(1, hidden_dim)
-        # self.uncertain_embed_0=nn.Embedding(1, hidden_dim)
-        # self.silence_embed_0=nn.Embedding(1, hidden_dim)
-        # self.audio_embed_1=nn.Embedding(1, hidden_dim)
-        # self.uncertain_embed_1=nn.Embedding(1, hidden_dim)
-        # self.silence_embed_1=nn.Embedding(1, hidden_dim)
-        # self.audio_embed_2=nn.Embedding(1, hidden_dim)
-        # self.uncertain_embed_2=nn.Embedding(1, hidden_dim)
-        # self.silence_embed_2=nn.Embedding(1, hidden_dim)
     
         self.audio_embed=nn.Embedding(1, hidden_dim)
         # self.uncertain_embed=nn.Embedding(1, hidden_dim)
