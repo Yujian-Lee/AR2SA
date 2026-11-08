@@ -896,9 +896,7 @@ def multi_scale_deformable_attention(
             value_l_, sampling_grid_l_, mode="bilinear", padding_mode="zeros", align_corners=False
         )
         sampling_value_list.append(sampling_value_l_)
-    # (batch_size, num_queries, num_heads, num_levels, num_points)
-    # -> (batch_size, num_heads, num_queries, num_levels, num_points)
-    # -> (batch_size, num_heads, 1, num_queries, num_levels*num_points)
+
     attention_weights = attention_weights.transpose(1, 2).reshape(
         batch_size * num_heads, 1, num_queries, num_levels * num_points
     )
