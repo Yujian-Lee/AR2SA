@@ -1687,8 +1687,6 @@ class Mask2FormerMaskedAttentionDecoderLayer(nn.Module):
             attn_mask=encoder_attention_mask,
             key_padding_mask=None,
         )
-        # print(hidden_states.shape) torch.Size([100, 5, 256])
-        # print(cross_attn_weights.shape) torch.Size([5, 100, 144])
         
         hidden_states = nn.functional.dropout(hidden_states, p=self.dropout, training=self.training)
         hidden_states = residual + hidden_states
