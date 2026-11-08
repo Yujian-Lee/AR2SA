@@ -1938,13 +1938,8 @@ class Mask2FormerMaskedAttentionDecoder(nn.Module):
         ###############################################################################################################################################
         if inputs_embeds is not None:
             hidden_states = inputs_embeds
-            # pre_hidden_states = inputs_embeds
-
-        # intermediate hidden states with layernorm applied - required for predicting class logits
         intermediate = ()
         anchor_intermediate = ()
-        # pre_intermediate_mask_predictions, pre_intermediate = (),()
-        # decoder layers
         pre_all_hidden_states,all_hidden_states = (),() if output_hidden_states else None
         pre_attentions,attentions = (),() if output_attentions else None
 
