@@ -2196,64 +2196,64 @@ class Mask2FormerTransformerModule(nn.Module):
         self.upsample_24_TO_12 = Semantic_flow(256,256)
         self.upsample_48_TO_24 = Semantic_flow(256,256)
     
-    def dpcknn(self, query_features, query_embeddings, VIS_FEATS, VIS_FEATS_pos, attention_mask, mask_features, size_list, intermediate_mask_predictions,  
-               intermediate, select):
-        VIS_FEATS_CTM = []
-        VIS_FEATS_CTM_pos = []
-        # all_hidden_states = ()
-        ratio = [1,1,1]
-        for i in range(len(VIS_FEATS)):
-            ctm = self.ctm_layer_feats[i]
-            # blk = self.tcblock[i]
+    # def dpcknn(self, query_features, query_embeddings, VIS_FEATS, VIS_FEATS_pos, attention_mask, mask_features, size_list, intermediate_mask_predictions,  
+    #            intermediate, select):
+    #     VIS_FEATS_CTM = []
+    #     VIS_FEATS_CTM_pos = []
+    #     # all_hidden_states = ()
+    #     ratio = [1,1,1]
+    #     for i in range(len(VIS_FEATS)):
+    #         ctm = self.ctm_layer_feats[i]
+    #         # blk = self.tcblock[i]
             
-            visual_features = VIS_FEATS[i]
-            K, B, C = visual_features.shape
-            H = W = int(math.sqrt(K))
-            # x = visual_features.permute(1,0,2)
+    #         visual_features = VIS_FEATS[i]
+    #         K, B, C = visual_features.shape
+    #         H = W = int(math.sqrt(K))
+    #         # x = visual_features.permute(1,0,2)
 
-            visual_features = visual_features.permute(1, 2, 0).reshape(B, C, H, W)
-            B,C,H,W = visual_features.shape
-            N_original = H * W  # 2304
-            P = int(H*W*ratio[i])  # 采样后的组数 (2304 * 0.25)
-            initial_token_dict = {
-                'x': visual_features.flatten(2).transpose(1, 2).contiguous(),
-                'map_size': [H, W],
-                'init_grid_size': [H, W],
-                'token_num': N_original,
-                'idx_token': torch.arange(N_original)[None, :].expand(B, -1).cuda()
-            }
-            token_dict, info_dict = ctm(initial_token_dict)
+    #         visual_features = visual_features.permute(1, 2, 0).reshape(B, C, H, W)
+    #         B,C,H,W = visual_features.shape
+    #         N_original = H * W  # 2304
+    #         P = int(H*W*ratio[i])  # 采样后的组数 (2304 * 0.25)
+    #         initial_token_dict = {
+    #             'x': visual_features.flatten(2).transpose(1, 2).contiguous(),
+    #             'map_size': [H, W],
+    #             'init_grid_size': [H, W],
+    #             'token_num': N_original,
+    #             'idx_token': torch.arange(N_original)[None, :].expand(B, -1).cuda()
+    #         }
+    #         token_dict, info_dict = ctm(initial_token_dict)
             
-            VIS_FEATS_CTM.append(token_dict['x'].permute(1,0,2))
-            VIS_FEATS_CTM_pos=VIS_FEATS_pos#.append(VIS_FEATS_pos)
+    #         VIS_FEATS_CTM.append(token_dict['x'].permute(1,0,2))
+    #         VIS_FEATS_CTM_pos=VIS_FEATS_pos#.append(VIS_FEATS_pos)
 
-        for i in range(9):
-            # all_hidden_states += (query_features, )
-            level_index = i % 3
-            attention_mask[torch.where(attention_mask.sum(-1) == attention_mask.shape[-1])] = False
+    #     for i in range(9):
+    #         # all_hidden_states += (query_features, )
+    #         level_index = i % 3
+    #         attention_mask[torch.where(attention_mask.sum(-1) == attention_mask.shape[-1])] = False
 
-            outputs = self.prelayers[i].forward_pre(
-                hidden_states=query_features,
-                level_index=level_index,
-                position_embeddings=VIS_FEATS_CTM_pos,
-                query_position_embeddings=query_embeddings,
-                encoder_hidden_states=VIS_FEATS_CTM,
-                encoder_attention_mask=attention_mask,
-                output_attentions=True,
-            )
-            intermediate_hidden_states = self.layernorm(outputs[0])
+    #         outputs = self.prelayers[i].forward_pre(
+    #             hidden_states=query_features,
+    #             level_index=level_index,
+    #             position_embeddings=VIS_FEATS_CTM_pos,
+    #             query_position_embeddings=query_embeddings,
+    #             encoder_hidden_states=VIS_FEATS_CTM,
+    #             encoder_attention_mask=attention_mask,
+    #             output_attentions=True,
+    #         )
+    #         intermediate_hidden_states = self.layernorm(outputs[0])
 
-            predicted_mask, attention_mask = self.premask_predictor(
-                intermediate_hidden_states,
-                mask_features,
-                size_list[(i + 1) % 3],
-            )
-            query_features = outputs[0]
+    #         predicted_mask, attention_mask = self.premask_predictor(
+    #             intermediate_hidden_states,
+    #             mask_features,
+    #             size_list[(i + 1) % 3],
+    #         )
+    #         query_features = outputs[0]
 
-            intermediate_mask_predictions += (predicted_mask,)
-            intermediate += (intermediate_hidden_states,)
-        # all_hidden_states += (query_features,)
-        return intermediate_mask_predictions, intermediate#, query_features, all_hidden_states
+    #         intermediate_mask_predictions += (predicted_mask,)
+    #         intermediate += (intermediate_hidden_states,)
+    #     # all_hidden_states += (query_features,)
+    #     return intermediate_mask_predictions, intermediate#, query_features, all_hidden_states
     
     def forward(
             self,
