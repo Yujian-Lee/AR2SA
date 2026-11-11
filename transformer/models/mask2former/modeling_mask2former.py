@@ -2775,7 +2775,6 @@ class Mask2FormerForUniversalSegmentation(Mask2FormerPreTrainedModel):
         auxiliary_logits: List[Dict(str, Tensor)] = []
 
         for aux_binary_masks, aux_classes in zip(output_masks[:-1], classes[:-1]):
-            # print(aux_classes.shape)
             auxiliary_logits.append({"masks_queries_logits": aux_binary_masks, "class_queries_logits": aux_classes})
 
         return auxiliary_logits
@@ -2970,8 +2969,6 @@ class Mask2FormerForUniversalSegmentation(Mask2FormerPreTrainedModel):
             )
             
         loss = self.get_loss(loss_dict)
-    
-            # loss_dict['loss_mask'] += extraloss_dict['loss_mask']
         loss = loss
         encoder_hidden_states = None
         pixel_decoder_hidden_states = None
