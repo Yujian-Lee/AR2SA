@@ -1618,7 +1618,6 @@ class Mask2FormerAttention(nn.Module):
         attn_output = attn_output.view(batch_size, self.num_heads, target_len, self.head_dim)
         attn_output = attn_output.transpose(1, 2)
         attn_output = attn_output.reshape(batch_size, target_len, embed_dim)
-        # attn_output = self.out_proj(attn_output)
         attn_output = self.avs_adapt(attn_output).permute(1, 0, 2)
         return attn_output, attn_weights_reshaped
 
