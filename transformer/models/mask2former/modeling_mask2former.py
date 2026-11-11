@@ -2221,33 +2221,6 @@ class Mask2FormerTransformerModule(nn.Module):
     #         VIS_FEATS_CTM.append(token_dict['x'].permute(1,0,2))
     #         VIS_FEATS_CTM_pos=VIS_FEATS_pos#.append(VIS_FEATS_pos)
 
-    #     for i in range(9):
-    #         # all_hidden_states += (query_features, )
-    #         level_index = i % 3
-    #         attention_mask[torch.where(attention_mask.sum(-1) == attention_mask.shape[-1])] = False
-
-    #         outputs = self.prelayers[i].forward_pre(
-    #             hidden_states=query_features,
-    #             level_index=level_index,
-    #             position_embeddings=VIS_FEATS_CTM_pos,
-    #             query_position_embeddings=query_embeddings,
-    #             encoder_hidden_states=VIS_FEATS_CTM,
-    #             encoder_attention_mask=attention_mask,
-    #             output_attentions=True,
-    #         )
-    #         intermediate_hidden_states = self.layernorm(outputs[0])
-
-    #         predicted_mask, attention_mask = self.premask_predictor(
-    #             intermediate_hidden_states,
-    #             mask_features,
-    #             size_list[(i + 1) % 3],
-    #         )
-    #         query_features = outputs[0]
-
-    #         intermediate_mask_predictions += (predicted_mask,)
-    #         intermediate += (intermediate_hidden_states,)
-    #     # all_hidden_states += (query_features,)
-    #     return intermediate_mask_predictions, intermediate#, query_features, all_hidden_states
     
     def forward(
             self,
