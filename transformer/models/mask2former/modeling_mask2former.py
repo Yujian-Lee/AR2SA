@@ -1947,15 +1947,10 @@ class Mask2FormerMaskedAttentionDecoder(nn.Module):
 
         intermediate_hidden_states = self.layernorm(inputs_embeds)
         intermediate += (intermediate_hidden_states,)
-
-        # pre_intermediate += (intermediate_hidden_states,)
-        
         predicted_mask, attention_mask = self.mask_predictor(
             intermediate_hidden_states, pixel_embeddings, feature_size_list[0]
         )         
 
-        # pre_predicted_mask, pre_attention_mask = self.pre_mask_predictor(intermediate_hidden_states,pixel_embeddings,
-        #                                                             feature_size_list[0])
 
         if audio_boost_mask is not None:
             audio_boost_mask = nn.functional.interpolate(
