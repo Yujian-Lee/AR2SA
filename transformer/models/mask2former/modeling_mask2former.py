@@ -2021,8 +2021,6 @@ class Mask2FormerMaskedAttentionDecoder(nn.Module):
 
                 
             hidden_states = layer_outputs[0]
-            # pre_hidden_states = pre_layer_outputs[0]
-            # print(output_attentions) # FALSE
             if output_attentions:
                 attentions += (layer_outputs[1],)
                 # pre_attentions += (pre_layer_outputs[1],)
