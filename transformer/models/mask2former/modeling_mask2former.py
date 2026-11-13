@@ -1962,7 +1962,6 @@ class Mask2FormerMaskedAttentionDecoder(nn.Module):
             #     aux_audio_boost_mask.unsqueeze(1), size=feature_size_list[0], mode="bilinear"
             # ).unsqueeze(1).repeat(1, self.num_heads, inputs_embeds.shape[0], 1, 1).flatten(0, 1).flatten(2)  # (b*nh)*q*hw
             #     audio_boost_mask = torch.sigmoid(audio_boost_mask + aux_audio_boost_mask)
-            #     attention_mask[torch.where(audio_boost_mask <0.5)] = True
             
         intermediate_mask_predictions += (predicted_mask,)
         for idx, decoder_layer in enumerate(self.layers):
