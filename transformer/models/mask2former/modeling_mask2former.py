@@ -1958,11 +1958,7 @@ class Mask2FormerMaskedAttentionDecoder(nn.Module):
             ).unsqueeze(1).repeat(1, self.num_heads, inputs_embeds.shape[0], 1, 1).flatten(0, 1).flatten(2)  # (b*nh)*q*hw
             attention_mask[torch.where(audio_boost_mask <0.5)] = True
             attention_mask[torch.where(audio_boost_mask >=0.5)] = False
-           
-            
-            # ).unsqueeze(1).repeat(1, self.num_heads, inputs_embeds.shape[0], 1, 1).flatten(0, 1).flatten(2)  # (b*nh)*q*hw
-            
-            
+          
         intermediate_mask_predictions += (predicted_mask,)
         for idx, decoder_layer in enumerate(self.layers):
             if output_hidden_states:
